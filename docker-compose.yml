@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   item-app:
-    build: .
+    image: ghcr.io/inurhuda00/item-app:v1
     ports:
       - 80:8080
     depends_on:
