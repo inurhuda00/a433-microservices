@@ -52,7 +52,7 @@ jobs:
         run: go test -v -short --count=1 $(go list ./...)
 
       - name: build and push docker image
-        run: .build_push_image_karsajobs.sh
+        run: ./build_push_image_karsajobs.sh
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
