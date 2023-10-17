@@ -4,11 +4,11 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  # Triggers the workflow on push or pull request events but only for the "karsajobs-ui" branch
   push:
-    branches: [ "main" ]
+    branches: [ "karsajobs-ui" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "karsajobs-ui" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -25,6 +25,8 @@ jobs:
     
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+        with: 
+          ref: karsajobs-ui
 
       - uses: hadolint/hadolint-action@v3.1.0
         with:
@@ -34,6 +36,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with: 
+          ref: karsajobs-ui
 
       - name: build and push docker image
         run: ./build_push_image_karsajobs_ui.sh
