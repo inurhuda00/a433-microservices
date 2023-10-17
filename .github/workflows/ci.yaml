@@ -31,7 +31,8 @@ jobs:
       - uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
-  build-test: 
+  build-test:
+    needs: lint-dockerfile
     runs-on: ubuntu-latest
 
     steps:
