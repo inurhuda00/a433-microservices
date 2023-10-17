@@ -2,7 +2,7 @@
   <div id="show-jobs-list">
                 <header class="mb-10">
                     <div class="text-center font-bold text-4xl text-gray-500 py-4">Karsa Jobs</div>
-                    <div class="text-center">Search jobs everywhere.</div>
+                    <div class="text-center">Search remote jobs everywhere.</div>
                 </header>
                 <div class="border border-red-500 rounded flex mb-10">
                     <input type="text" v-model="search" class="px-4 py-2 w-full" placeholder="Search...">

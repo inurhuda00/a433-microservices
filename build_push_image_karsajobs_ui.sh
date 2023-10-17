@@ -7,6 +7,7 @@ IMAGE_TAG="latest"
 # Nama akun GitHub 
 GITHUB_USERNAME="inurhuda00"
 
+CR_PAT=$GITHUB_TOKEN
 # export CR_PAT=YOUR_TOKEN; 
 echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
 
