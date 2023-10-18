@@ -1,63 +1,84 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
+# Kontrol kapan workflow akan berjalan
 on:
-  # Triggers the workflow on push or pull request events but only for the "karsajobs" branch
+  # Memicu workflow pada peristiwa push atau pull request, namun hanya pada cabang "karsajobs"
   push:
     branches: [ "karsajobs" ]
   pull_request:
     branches: [ "karsajobs" ]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Memungkinkan menjalankan workflow ini secara manual dari tab Actions
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # mendefinisikan job "lint-dockerfile"
   lint-dockerfile:
-    # The type of runner that the job will run on
+    # Jenis runner yang akan digunakan oleh job ini
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Langkah-langkah untuk menjalakan jon lint
     steps:
     
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checkout repositori, sehingga job dapat mengkases
       - uses: actions/checkout@v4
         with:
           ref: karsajobs
 
+      # Menggunakan hadolint-action untuk lint Dockerfile
       - uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
-  build-test:
+  
+  # konfigurasi job "test-app"
+  test-app: 
+    # Job "test-app" bergantung pada job "lint-dockerfile" akan dijalankan setelah lint-dockerfile berhasil
     needs: lint-dockerfile
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
-    steps:
+    # Langkah-langkah untuk "test-app"
+    steps: 
+      # Checkout repositori di bawah $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
         with:
           ref: karsajobs
 
+      # Setup Go environment
       - name: Setup Go
         uses: actions/setup-go@v4
         with: 
+          # versi go yang digunakan
           go-version: '1.15'
       
+      # Install dependensi Go
       - name: Install dependencies
         run: go mod download
 
+      # Jalankan pengujian dengan Go
       - name: Test with Go
         run: go test -v -short --count=1 $(go list ./...)
+  # konfigurasi job build-app-karsajobs
+  build-app-karsajobs:
+  # Job "build-app-karsajobs" bergantung pada job "test-app"
+    needs: test-app
+    runs-on: ubuntu-latest
+    # menentukan permission untuk job
+    permissions:
+      # Menunjukkan bahwa job memiliki izin untuk membaca (read) konten dari repositori. 
+      contents: read
+      # : Menunjukkan bahwa job memiliki izin untuk menulis (write) paket atau artefak yang dihasilkan oleh job ke penyimpanan GitHub Packages atau registri paket internal GitHub.
+      packages: write
 
+    # Langkah-langkah untuk membangun dan mengirimkan gambar Docker
+    steps:
+      # Checkout repositori di bawah $GITHUB_WORKSPACE
+      - uses: actions/checkout@v4
+        with:
+          ref: karsajobs
+
+      # Jalankan skrip shell untuk membangun dan mengirimkan gambar Docker
       - name: build and push docker image
         run: ./build_push_image_karsajobs.sh
         env: 
+        # menentukan env GITHUB_TOKEN ke script "./build_push_image_karsajobs.sh"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
-      
-      
