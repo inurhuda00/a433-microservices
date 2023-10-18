@@ -1,52 +1,56 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
+# Kontrol kapan workflow akan berjalan
 on:
-  # Triggers the workflow on push or pull request events but only for the "karsajobs-ui" branch
+  # Memicu workflow pada peristiwa push atau pull request, namun hanya pada cabang "karsajobs-ui"
   push:
     branches: [ "karsajobs-ui" ]
   pull_request:
     branches: [ "karsajobs-ui" ]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Memungkinkan menjalankan workflow ini secara manual dari tab Actions
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # Konfigurasi job "lint-dockerfile"
   lint-dockerfile:
-    # The type of runner that the job will run on
+    # Jenis runner yang akan digunakan oleh job ini
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Langkah-langkah untuk menjalakan jon lint
     steps:
     
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checkout repositori  di bawah $GITHUB_WORKSPACE, sehingga job dapat mengaksesnya
       - uses: actions/checkout@v4
         with: 
           ref: karsajobs-ui
 
+      # Gunakan hadolint untuk melakukan linting pada Dockerfile
       - uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
-  build-test: 
+          
+  build-app-karsajobs-ui: 
+  # Job "build-app-karsajobs-ui" bergantung pada job "lint-dockerfile"
     needs: lint-dockerfile
     runs-on: ubuntu-latest
+      # menentukan permission untuk job
     permissions:
+      # Menunjukkan bahwa job memiliki izin untuk membaca (read) konten dari repositori. 
       contents: read
+      # : Menunjukkan bahwa job memiliki izin untuk menulis (write) paket atau artefak yang dihasilkan oleh job ke penyimpanan GitHub Packages atau registri paket internal GitHub.
       packages: write
 
+    # Langkah-langkah untuk membangun dan mengirimkan gambar Docker
     steps:
+      # Checkout repositori di bawah $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
         with: 
           ref: karsajobs-ui
 
+      # Jalankan skrip shell untuk membangun dan mengirimkan gambar Docker
       - name: build and push docker image
         run: ./build_push_image_karsajobs_ui.sh
+        # Variabel lingkungan untuk otentikasi dengan menggunakan token GitHub
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
-      
-      
